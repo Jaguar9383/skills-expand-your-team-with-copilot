@@ -705,9 +705,11 @@ footer {
   top: 10px;
   right: 180px;
   background-color: rgba(255, 255, 255, 0.2);
+  border: none;
   border-radius: 20px;
   padding: 6px 12px;
   font-size: 0.85rem;
+  color: inherit;
   display: flex;
   align-items: center;
   gap: 5px;
@@ -724,7 +726,7 @@ footer {
 }
 
 /* Responsive adjustment for dark mode toggle */
-@media (max-width: 600px) {
+@media (max-width: 767px) {
   #dark-mode-toggle {
     right: 15px;
     top: 60px;
