@@ -489,7 +489,7 @@ document.addEventListener("DOMContentLoaded", () => {
   function shareOnTwitter(activityName, description, schedule) {
     const text = createShareText(activityName, description, schedule);
     const url = createShareUrl(activityName);
-    const twitterUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(url)}`;
+    const twitterUrl = `https://x.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(url)}`;
     window.open(twitterUrl, '_blank', 'width=550,height=420');
   }
 
@@ -508,22 +508,54 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function copyShareLink(activityName, button) {
     const url = createShareUrl(activityName);
-    navigator.clipboard.writeText(url).then(() => {
-      // Change button text temporarily
-      const originalText = button.innerHTML;
-      button.innerHTML = '<span class="share-icon">✓</span> Copied!';
-      button.classList.add('copied');
+    
+    // Check if clipboard API is available
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(url).then(() => {
+        // Change button text temporarily
+        const originalText = button.innerHTML;
+        button.innerHTML = '<span class="share-icon">✓</span> Copied!';
+        button.classList.add('copied');
+        
+        setTimeout(() => {
+          button.innerHTML = originalText;
+          button.classList.remove('copied');
+        }, 2000);
+        
+        showMessage('Link copied to clipboard!', 'success');
+      }).catch(err => {
+        console.error('Failed to copy:', err);
+        showMessage('Failed to copy link', 'error');
+      });
+    } else {
+      // Fallback for browsers without clipboard API
+      const textArea = document.createElement('textarea');
+      textArea.value = url;
+      textArea.style.position = 'fixed';
+      textArea.style.left = '-999999px';
+      document.body.appendChild(textArea);
+      textArea.focus();
+      textArea.select();
       
-      setTimeout(() => {
-        button.innerHTML = originalText;
-        button.classList.remove('copied');
-      }, 2000);
-      
-      showMessage('Link copied to clipboard!', 'success');
-    }).catch(err => {
-      console.error('Failed to copy:', err);
-      showMessage('Failed to copy link', 'error');
-    });
+      try {
+        document.execCommand('copy');
+        const originalText = button.innerHTML;
+        button.innerHTML = '<span class="share-icon">✓</span> Copied!';
+        button.classList.add('copied');
+        
+        setTimeout(() => {
+          button.innerHTML = originalText;
+          button.classList.remove('copied');
+        }, 2000);
+        
+        showMessage('Link copied to clipboard!', 'success');
+      } catch (err) {
+        console.error('Fallback copy failed:', err);
+        showMessage('Failed to copy link', 'error');
+      } finally {
+        document.body.removeChild(textArea);
+      }
+    }
   }
 
   // Function to render a single activity card
@@ -624,17 +656,17 @@ document.addEventListener("DOMContentLoaded", () => {
         }
       </div>
       <div class="social-share-container">
-        <button class="social-share-button twitter" data-activity="${name}" data-action="twitter" title="Share on Twitter">
-          <span class="share-icon">🐦</span> Twitter
+        <button class="social-share-button twitter" data-activity="${name}" data-action="twitter" title="Share on Twitter" aria-label="Share ${name} on Twitter">
+          <span class="share-icon" aria-hidden="true">🐦</span> Twitter
         </button>
-        <button class="social-share-button facebook" data-activity="${name}" data-action="facebook" title="Share on Facebook">
-          <span class="share-icon">📘</span> Facebook
+        <button class="social-share-button facebook" data-activity="${name}" data-action="facebook" title="Share on Facebook" aria-label="Share ${name} on Facebook">
+          <span class="share-icon" aria-hidden="true">📘</span> Facebook
         </button>
-        <button class="social-share-button email" data-activity="${name}" data-action="email" title="Share via Email">
-          <span class="share-icon">✉️</span> Email
+        <button class="social-share-button email" data-activity="${name}" data-action="email" title="Share via Email" aria-label="Share ${name} via Email">
+          <span class="share-icon" aria-hidden="true">✉️</span> Email
         </button>
-        <button class="social-share-button copy" data-activity="${name}" data-action="copy" title="Copy Link">
-          <span class="share-icon">🔗</span> Copy
+        <button class="social-share-button copy" data-activity="${name}" data-action="copy" title="Copy Link" aria-label="Copy link to ${name}">
+          <span class="share-icon" aria-hidden="true">🔗</span> Copy
         </button>
       </div>
     `;
