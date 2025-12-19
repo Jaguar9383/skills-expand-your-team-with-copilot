@@ -27,7 +27,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Dark mode elements
   const darkModeToggle = document.getElementById("dark-mode-toggle");
-  const themeIcon = darkModeToggle.querySelector(".theme-icon");
+  const themeIcon = darkModeToggle ? darkModeToggle.querySelector(".theme-icon") : null;
   const themeText = document.getElementById("theme-text");
 
   // Activity categories with corresponding colors
@@ -66,6 +66,8 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function updateDarkModeUI(isDarkMode) {
+    if (!themeIcon || !themeText) return;
+    
     if (isDarkMode) {
       themeIcon.textContent = "☀️";
       themeText.textContent = "Light Mode";
@@ -76,7 +78,9 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   // Dark mode event listener
-  darkModeToggle.addEventListener("click", toggleDarkMode);
+  if (darkModeToggle) {
+    darkModeToggle.addEventListener("click", toggleDarkMode);
+  }
 
   // Time range mappings for the dropdown
   const timeRanges = {
